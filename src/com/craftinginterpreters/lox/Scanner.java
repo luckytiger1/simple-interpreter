@@ -98,7 +98,24 @@ public class Scanner {
                 addToken(match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
                 break;
             case '/':
-                if (match('/')) {
+                if (match('*')) {
+                    for (; ; ) {
+                        if (peek() == '\n') line++;
+
+                        if (isAtEnd()) {
+                            Lox.error(line, "Comment block not closed.");
+                            break;
+                        } else {
+                            advance();
+                        }
+
+                        if (peek() == '*' && peekNext() == '/') {
+                            advance();
+                            advance();
+                            break;
+                        }
+                    }
+                } else if (match('/')) {
                     while (peek() != '\n' && !isAtEnd()) advance();
                 } else {
                     addToken(TokenType.SLASH);

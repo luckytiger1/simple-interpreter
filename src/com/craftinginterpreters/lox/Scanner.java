@@ -103,7 +103,7 @@ public class Scanner {
                         if (peek() == '\n') line++;
 
                         if (isAtEnd()) {
-                            Lox.error(line, "Comment block not closed.");
+                            Lox.error(new Token(TokenType.EOF, "", null, line), "Comment block not closed.");
                             break;
                         } else {
                             advance();
@@ -137,7 +137,7 @@ public class Scanner {
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    Lox.error(line, "Unexpected character.");
+                    Lox.error(new Token(TokenType.EOF, "", null, line), "Unexpected character.");
                 }
                 break;
         }
@@ -218,7 +218,7 @@ public class Scanner {
         }
 
         if (isAtEnd()) {
-            Lox.error(line, "Unterminated string.");
+            Lox.error(new Token(TokenType.EOF, "", null, line), "Unterminated string.");
             return;
         }
 

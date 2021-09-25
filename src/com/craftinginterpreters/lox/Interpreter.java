@@ -16,14 +16,19 @@ public class Interpreter implements Expr.Visitor<Object> {
 
         if (value instanceof Double) {
             String text = value.toString();
-            if (text.endsWith(".0")) {
-                text = text.substring(0, text.length() - 2);
-            }
+            text = formatDouble(text);
 
             return text;
         }
 
         return value.toString();
+    }
+
+    private String formatDouble(String text) {
+        if (text.endsWith(".0")) {
+            text = text.substring(0, text.length() - 2);
+        }
+        return text;
     }
 
     @Override
@@ -37,6 +42,7 @@ public class Interpreter implements Expr.Visitor<Object> {
                 return (double) left - (double) right;
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
+                checkDivisionByZero(expr.operator, right);
                 return (double) left / (double) right;
             case STAR:
                 checkNumberOperands(expr.operator, left, right);
@@ -47,6 +53,9 @@ public class Interpreter implements Expr.Visitor<Object> {
                 }
                 if (left instanceof String && right instanceof String) {
                     return (String) left + (String) right;
+                }
+                if (left instanceof String && right instanceof Double) {
+                    return left + formatDouble(right.toString());
                 }
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
             case GREATER:
@@ -104,6 +113,11 @@ public class Interpreter implements Expr.Visitor<Object> {
         if (left instanceof Double && right instanceof Double) return;
 
         throw new RuntimeError(operator, "Operands must be a numbers");
+    }
+
+    private void checkDivisionByZero(Token operator, Object right) {
+        if ((double) right != 0) return;
+        throw new RuntimeError(operator, "Can't divide by zero");
     }
 
     private boolean isTruthy(Object object) {
